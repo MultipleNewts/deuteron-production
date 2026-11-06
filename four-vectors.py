@@ -20,7 +20,34 @@ class FourVector():
         """
         self.p = np.array(p, dtype=float)
 
+    def __add__(self, other):
+        """
+            Defines four-vector addition, allows use of the `+` operator
+
+            Parameters
+            ----------
+            self : `FourVector`
+                A momentum four-vector
+            other : `FourVector`
+                A momentum four-vector
+
+            Returns
+            -------
+            sum : `FourVector`
+                the sum of the two supplied four-vectors
+        """
+        return FourVector(self.p + other.p)
+
+    def set_pvectr(self, p):
+        """
+            Manually sets the four-vector to a new state
+        """
+        self.p = np.array(p, dtype=float)
+
     def get_lfactor(self, beta):
+        """
+            Computes gamma for a given total beta
+        """
         return 1/(np.sqrt(1-beta**2))
 
     def shift_to_v(self, v):
@@ -49,6 +76,9 @@ class FourVector():
         self.shift_to_v(-np.array(v))
 
     def axis_lorentz(self, v):
+        """
+            Computes a single axis Lorentz transformation of `v`
+        """
         idx = np.flatnonzero(v)
         axis = idx[0] + 1
         E = self.p[0]
@@ -60,6 +90,9 @@ class FourVector():
         self.p[axis] = gamma * (p_mag - beta*E)
 
     def general_lorentz(self, v):
+        """
+            Computes the Lorentz Transformation for a velocity in an arbitrary direction
+        """
         bx, by, bz = np.array(v)/c
         beta = np.sqrt(bx**2 + by**2 + bz**2)
         gamma = self.get_lfactor(beta)
@@ -75,9 +108,33 @@ class FourVector():
 
 
 # %%
-test1 = FourVector([938, 0, 0, 0])
-test1.boost([0.2*c, 0.8*c, -0.4*c])
-print(f"result: {test1.p}")
-
+if __name__ == "__main__":
+    four_vectors = np.array([
+        [938, 0, 0, 0],
+        [938, 0, 0, 0],
+        [938, 0, 0, 0],
+        [1000, 0, 600, 0],
+        [1000, 300, 0, 400],
+        [1000, 1000, 0, 0]
+    ], dtype=float)
+    betas = np.array([
+        [0, 0, 0],
+        [0, 0.8, 0],
+        [0.2, 0.8, -0.4],
+        [0, 0.5, 0],
+        [0, 0.6, 0],
+        [0, 0.6, 0]
+    ], dtype=float)
+    vs = betas*c
+    temp = FourVector([0, 0, 0, 0])
+    for vect, vel in zip(four_vectors, vs):
+        temp.set_pvectr(vect)
+        temp.shift_to_v(vel)
+        print(f"result: {temp.p}")
+# %%
+p1 = FourVector([1, 2, -1, 0])
+p2 = FourVector([2, 2, 2, 2])
+CoM = p1 + p2
+print(CoM.p)
 
 # %%
