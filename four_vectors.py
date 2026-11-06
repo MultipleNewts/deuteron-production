@@ -3,7 +3,7 @@ import numpy as np
 from scipy.constants import c
 
 
-class FourVector():
+class FourVector:
     def __init__(self, p):
         """
             Creates a four-vector that enables Lorentz transformations and finding CoM frames
@@ -131,10 +131,10 @@ if __name__ == "__main__":
         temp.set_pvectr(vect)
         temp.shift_to_v(vel)
         print(f"result: {temp.p}")
-# %%
-p1 = FourVector([1, 2, -1, 0])
-p2 = FourVector([2, 2, 2, 2])
-CoM = p1 + p2
-print(CoM.p)
+
+    p1 = FourVector([1, 2, -1, 0])
+    p2 = FourVector([2, 2, 2, 2])
+    CoM = p1 + p2
+    print(CoM.p)
 
 # %%
