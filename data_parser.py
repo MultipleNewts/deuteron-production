@@ -15,6 +15,12 @@ class Particle:
     vector: FourVector
     mass: float
 
+    # running `Particle | Particle` will shift the two particles into their mutual CoM frame
+    def __or__(self, other):
+        X = self.vector + other.vector
+        V = X.get_velo()
+        self.vector.shift_to_v(V)
+        other.vector.shift_to_v(V)
 
 # A dataclass for managing events
 # it has a unique ID, the list of involved particles, and the CoM frame
