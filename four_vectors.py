@@ -44,6 +44,11 @@ class FourVector:
         """
         self.p = np.array(p, dtype=float)
 
+    def get_velo(self):
+        E = self.p[0]
+        scale = E/c
+        return np.array([self.p[1], self.p[2], self.p[3]])/scale
+
     def get_lfactor(self, beta):
         """
             Computes gamma for a given total beta
