@@ -1,9 +1,14 @@
 # %%
-from four_vectors import FourVector
 from dataclasses import dataclass
 import numpy as np
+from four_vectors import FourVector
 
 
+# A particle dataclass for the datastructure
+# the particle string starts with either "m-" or "a-" for matter and antimatter respectively
+# then it is succeeded by "-p" or "-n" for proton or neutron respectively
+# it also contains the corresponds four-vector and mass
+# Note: energy and mass-energy are in GeV and GeV/c^2
 @dataclass
 class Particle:
     particle: str
@@ -11,15 +16,18 @@ class Particle:
     mass: float
 
 
+# A dataclass for managing events
+# it has a unique ID, the list of involved particles, and the CoM frame
 @dataclass
 class ParticleEvent:
     id: int
     particles: np.ndarray
-    cm_frame: FourVector
 
 
+# A class to manage the complete catalogue of events
 class EventCatalogue:
-    def __init__(self, filename):
+    def __init__(self, filename, debug=False):
+        self.debug = debug
         self.events = []
         self.parse_data(filename)
 
@@ -29,8 +37,13 @@ class EventCatalogue:
 
         events = content.split("\n\n")
 
+        if self.debug is True:
+            top = 10
+        else:
+            top = -1
+
         id = 0
-        for event in events[1:-1]:
+        for event in events[1:top]:
             part_list = []
             particles = event.split("\n")
             for particle in particles:
@@ -42,8 +55,7 @@ class EventCatalogue:
 
             id += 1
             pl = np.array(part_list)
-            cm = FourVector([0, 0, 0, 0])  # placeholder value
-            self.events.append(ParticleEvent(id, pl, cm))
+            self.events.append(ParticleEvent(id, pl))
 
     def particle_decode(self, value):
         match value:
@@ -61,8 +73,5 @@ class EventCatalogue:
 
 
 # %%
-pythia_EC = EventCatalogue("deuteron.dat")
-
-# %%
-print(pythia_EC.events[0].particles[0].type)
-# %%
+if __name__ == "__main__":
+    pythia_EC = EventCatalogue("deuteron.dat")
