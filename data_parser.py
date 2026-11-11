@@ -1,7 +1,20 @@
 # %%
 from dataclasses import dataclass
+from enum import Enum
 import numpy as np
 from four_vectors import FourVector
+
+
+# define a matter type class
+class MatterType(Enum):
+    MATTER = "m"
+    ANTIMATTER = "a"
+
+
+# define a nucleon type class
+class Nucleon(Enum):
+    PROTON = "p"
+    NEUTRON = "n"
 
 
 # A particle dataclass for the datastructure
@@ -11,7 +24,8 @@ from four_vectors import FourVector
 # Note: energy and mass-energy are in GeV and GeV/c^2
 @dataclass
 class Particle:
-    particle: str
+    mat_type: MatterType
+    particle: Nucleon
     vector: FourVector
     mass: float
 
@@ -22,12 +36,28 @@ class Particle:
         self.vector.shift_to_v(V)
         other.vector.shift_to_v(V)
 
+    def __add__(self, other):
+        return FourVector(self.vector.p + other.vector.p)
+
+    def __sub__(self, other):
+        return FourVector(self.vector.p - other.vector.p)
+
+
 # A dataclass for managing events
 # it has a unique ID, the list of involved particles, and the CoM frame
 @dataclass
 class ParticleEvent:
     id: int
     particles: np.ndarray
+
+
+@dataclass
+class Pairing:
+    mat_type: MatterType
+    particles: np.ndarray
+
+    def shift(self):
+        self.particles[0] | self.particles[1]
 
 
 # A class to manage the complete catalogue of events
@@ -56,8 +86,8 @@ class EventCatalogue:
                 raw_data = particle.split()
                 data = [int(raw_data[0]), *map(float, raw_data[1:])]
                 vect = FourVector([data[1], data[2], data[3], data[4]])
-                name = self.particle_decode(data[0])
-                part_list.append(Particle(name, vect, data[5]))
+                p_info = self.particle_decode(data[0])
+                part_list.append(Particle(MatterType(p_info[0]), Nucleon(p_info[1]), vect, data[5]))
 
             id += 1
             pl = np.array(part_list)
@@ -66,13 +96,13 @@ class EventCatalogue:
     def particle_decode(self, value):
         match value:
             case 2212:
-                return "mp"
+                return ("m", "p")
             case -2212:
-                return "ap"
+                return ("a", "p")
             case 2112:
-                return "mn"
+                return ("m", "n")
             case -2112:
-                return "an"
+                return ("a", "n")
             case _:
                 raise ValueError(f"{value} is an unrecognised particle label; "
                                  "only (+/-)2212 and (+/-)2112 are valid.")
