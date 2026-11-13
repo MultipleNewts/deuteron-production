@@ -3,15 +3,15 @@ import data_parser as dp
 import numpy as np
 
 valid_combs = [
-    [dp.Nucleon.PROTON, dp.Nucleon.NEUTRON],
-    [dp.Nucleon.NEUTRON, dp.Nucleon.PROTON],
+    [dp.Hadron.PROTON, dp.Hadron.NEUTRON],
+    [dp.Hadron.NEUTRON, dp.Hadron.PROTON],
 ]
 
 DR_valid_combs = [
-    [dp.Nucleon.PROTON, dp.Nucleon.NEUTRON],
-    [dp.Nucleon.NEUTRON, dp.Nucleon.PROTON],
-    [dp.Nucleon.PROTON, dp.Nucleon.PROTON],
-    [dp.Nucleon.NEUTRON, dp.Nucleon.NEUTRON],
+    [dp.Hadron.PROTON, dp.Hadron.NEUTRON],
+    [dp.Hadron.NEUTRON, dp.Hadron.PROTON],
+    [dp.Hadron.PROTON, dp.Hadron.PROTON],
+    [dp.Hadron.NEUTRON, dp.Hadron.NEUTRON],
 ]
 
 

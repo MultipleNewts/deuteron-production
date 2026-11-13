@@ -12,9 +12,10 @@ class MatterType(Enum):
 
 
 # define a nucleon type class
-class Nucleon(Enum):
+class Hadron(Enum):
     PROTON = "p"
     NEUTRON = "n"
+    DEUTERON = "D"
 
 
 # A particle dataclass for the datastructure
@@ -25,7 +26,7 @@ class Nucleon(Enum):
 @dataclass
 class Particle:
     mat_type: MatterType
-    particle: Nucleon
+    particle: Hadron
     vector: FourVector
     mass: float
 
@@ -102,7 +103,7 @@ class EventCatalogue:
                 data = [int(raw_data[0]), *map(float, raw_data[1:])]
                 vect = FourVector([data[1], data[2], data[3], data[4]])
                 p_info = self.particle_decode(data[0])
-                part_list.append(Particle(MatterType(p_info[0]), Nucleon(p_info[1]), vect, data[5]))
+                part_list.append(Particle(MatterType(p_info[0]), Hadron(p_info[1]), vect, data[5]))
 
             id += 1
             pl = np.array(part_list)
