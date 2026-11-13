@@ -35,10 +35,10 @@ def find_k(particles):
     return np.sqrt(np.sum(np.power(p_diff, 2)))
 
 
-def validate_pair(pair, cutoff=0.2):
+def validate_pair(pair, cutoff=0.1):
     pair.shift()
     k = find_k(pair.particles)
-    if k >= cutoff:
+    if k <= cutoff:
         return True
     return False
 
@@ -52,10 +52,6 @@ def get_valid_pairs(event):
             if validate_pair(pair):
                 valid_pairs.append(pair)
                 for part in valid_pairs[-1].particles:
-                    # print(part)
-                    # print(valid_pairs[-1])
-                    # print(valid_pairs[-1].particles)
-                    # print(np.where(particles == part))
                     particles = np.delete(particles, np.where(particles == part))
                 pairs = get_all_pairs(particles)
                 break
