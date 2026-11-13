@@ -1,5 +1,5 @@
 # %%
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
 import numpy as np
 from four_vectors import FourVector
@@ -55,9 +55,24 @@ class ParticleEvent:
 class Pairing:
     mat_type: MatterType
     particles: np.ndarray
+    cm_velo: FourVector = field(init=False)
 
-    def shift(self):
-        self.particles[0] | self.particles[1]
+    def __post_init__(self):
+        self.cm_velo = self.get_pair_v()
+
+    def shift(self, V):
+        self.particles[0].vector.shift_to_v(V)
+        self.particles[1].vector.shift_to_v(V)
+
+    def com(self):
+        self.shift(self.cm_velo)
+
+    def lab(self):
+        self.shift(-self.cm_velo)
+
+    def get_pair_v(self):
+        X = self.particles[0] + self.particles[1]
+        return X.get_velo()
 
 
 # A class to manage the complete catalogue of events
