@@ -76,6 +76,12 @@ class Pairing:
         return X.get_velo()
 
 
+@dataclass
+class Deuteron(Particle):
+    particle: Hadron = field(default=Hadron.DEUTERON, init=False)
+    mass: float = field(default=1.875612, init=False)
+
+
 # A class to manage the complete catalogue of events
 class EventCatalogue:
     def __init__(self, filename, debug=False):
