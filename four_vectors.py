@@ -38,6 +38,9 @@ class FourVector:
         """
         return FourVector(self.p + other.p)
 
+    def __str__(self):
+        return f"{self.p}"
+
     def set_pvectr(self, p):
         """
             Manually sets the four-vector to a new state
