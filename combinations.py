@@ -35,26 +35,44 @@ def find_k(particles):
     return np.sqrt(np.sum(np.power(p_diff, 2)))
 
 
-def validate_pair(pair, cutoff=0.1):
-    pair.shift()
+def validate_pair(pair, cutoff):
+    pair.com()
     k = find_k(pair.particles)
+    pair.lab()
     if k <= cutoff:
         return True
     return False
 
 
-def get_valid_pairs(event):
+def get_valid_pairs(event, max_depth, cutoff):
     particles = event.particles
     pairs = get_all_pairs(particles)
     valid_pairs = []
-    while pairs.size != 0:
+    itr = 0
+    while (pairs.size != 0) and (itr < max_depth):
+        itr += 1
         for pair in pairs:
-            if validate_pair(pair):
+            if validate_pair(pair, cutoff):
                 valid_pairs.append(pair)
                 for part in valid_pairs[-1].particles:
                     particles = np.delete(particles, np.where(particles == part))
                 pairs = get_all_pairs(particles)
+                np.random.shuffle(pairs)
                 break
     return np.array(valid_pairs)
+
+
+def form_deuterons(event, max_depth=50, cutoff=0.1):
+    valid_pairs = get_valid_pairs(event, max_depth, cutoff)
+    deuterons = []
+    if valid_pairs.size != 0:
+        for pair in valid_pairs:
+            X = pair.get_inter_particle()
+            # NOTE: X is NOT the correct FourVector, correct using maths and isotropic sampling
+            d = dp.Deuteron(pair.mat_type, X, pair.cm_velo)
+            d.lab()
+            deuterons.append(d)
+        return deuterons
+    return None
 
 # %%
