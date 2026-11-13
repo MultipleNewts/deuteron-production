@@ -56,7 +56,7 @@ class ParticleEvent:
 class Pairing:
     mat_type: MatterType
     particles: np.ndarray
-    cm_velo: FourVector = field(init=False)
+    cm_velo: np.ndarray = field(init=False)
 
     def __post_init__(self):
         self.cm_velo = self.get_pair_v()
@@ -71,15 +71,28 @@ class Pairing:
     def lab(self):
         self.shift(-self.cm_velo)
 
+    def get_inter_particle(self):
+        return self.particles[0] + self.particles[1]
+
     def get_pair_v(self):
-        X = self.particles[0] + self.particles[1]
+        X = self.get_inter_particle()
         return X.get_velo()
 
 
 @dataclass
 class Deuteron(Particle):
+    cm_velo: np.ndarray
     particle: Hadron = field(default=Hadron.DEUTERON, init=False)
     mass: float = field(default=1.875612, init=False)
+
+    def shift(self, V):
+        self.vector.shift_to_v(V)
+
+    def com(self):
+        self.shift(self.cm_velo)
+
+    def lab(self):
+        self.shift(-self.cm_velo)
 
 
 # A class to manage the complete catalogue of events
