@@ -1,4 +1,7 @@
 # %%
+import numpy as np
+
+
 def get_cross_section(deuterons, nevents):
     """
         Computes the cross-section given the number of deuterons and number of events
@@ -17,3 +20,10 @@ def get_cross_section(deuterons, nevents):
     """
     count = deuterons.size
     return (count/nevents)*100e-3
+
+
+def get_trnsv_momentum(deuteron):
+    vect = deuteron.vector.p
+    px = vect[1]
+    py = vect[2]
+    return np.sqrt(px**2+py**2)
