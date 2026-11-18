@@ -1,4 +1,5 @@
 # %%
+from four_vectors import FourVector
 import data_parser as dp
 import numpy as np
 
@@ -14,6 +15,8 @@ DR_valid_combs = [
     [dp.Hadron.NEUTRON, dp.Hadron.NEUTRON],
 ]
 
+deut_mass = 1.8756129
+
 
 def get_all_pairs(particles):
     pairs = []
@@ -23,7 +26,9 @@ def get_all_pairs(particles):
                 combi = [p1.particle, p2.particle]
                 if (p2.mat_type == p1.mat_type) and (combi in valid_combs):
                     pairs.append(dp.Pairing(p1.mat_type, np.array([p1, p2])))
-        return np.array(pairs)
+        pairs_list = np.array(pairs)
+        np.random.shuffle(pairs_list)
+        return pairs_list
     else:
         return np.array([])
 
@@ -62,14 +67,35 @@ def get_valid_pairs(event, max_depth, cutoff):
     return np.array(valid_pairs)
 
 
+def isotropic_sample():
+    """
+        Returns a uniformly random direction on a sphere
+
+        Returns
+        -------
+        vct : `array`
+            the coordinates of the unit vector (i.e. from origin to `vct`) of form `[x,y,z]`
+    """
+    phi = np.random.uniform(0, 2*np.pi)
+    theta = np.arccos(np.random.uniform(-1, 1))
+    coords = np.array([np.sin(theta)*np.cos(phi), np.sin(theta)*np.sin(phi), np.cos(theta)])
+    return coords
+
+
 def form_deuterons(event, max_depth=50, cutoff=0.1):
     valid_pairs = get_valid_pairs(event, max_depth, cutoff)
     deuterons = []
     if valid_pairs.size != 0:
         for pair in valid_pairs:
+            pair.com()
             X = pair.get_inter_particle()
-            # NOTE: X is NOT the correct FourVector, correct using maths and isotropic sampling
-            d = dp.Deuteron(pair.mat_type, X, pair.cm_velo)
+            pair.lab()
+            invar_mass = X.p[0]
+            p_mag = ((invar_mass**2)-(deut_mass**2))/(2*invar_mass)
+            p_vect = p_mag * isotropic_sample()
+            E = np.sqrt((invar_mass**2) + (np.sum(p_vect)**2))
+            fv = FourVector([E, *p_vect])
+            d = dp.Deuteron(pair.mat_type, fv, pair.cm_velo)
             d.lab()
             deuterons.append(d)
         return deuterons
