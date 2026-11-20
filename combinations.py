@@ -1,7 +1,9 @@
 # %%
 from four_vectors import FourVector
 import data_parser as dp
+import dal_raklev_equations as dr
 import numpy as np
+import random
 
 valid_combs = [
     [dp.Hadron.PROTON, dp.Hadron.NEUTRON],
@@ -49,6 +51,28 @@ def validate_pair(pair, cutoff):
     return False
 
 
+def dr_validate(pair):
+    pair.com()
+    k = find_k(pair.particles)
+    pair.lab()
+    types = [pair.particles[0].particle, pair.particles[1].particle]
+    sigmas = []
+    sigmas.append(dr.pn_dg_cross(k))
+    sigmas.append(dr.hh_pi0_cross(k, types))
+    sigmas.append(dr.hh_dpi_cross(k))
+    sigmas.append(dr.pn_pipm_cross(k))
+    if (k < 0.3) or (k > 3):
+        return 0
+    else:
+        sigmas = np.array(sigmas)
+        weights = sigmas/np.sum(sigmas)
+        total = np.sum(sigmas)
+        sigmas /= total
+        options = [1, 2, 3, 4]
+        choice = random.choices(options, weights=weights)
+        return choice
+
+
 def get_valid_pairs(event, max_depth, cutoff):
     particles = event.particles
     pairs = get_all_pairs(particles)
@@ -65,6 +89,46 @@ def get_valid_pairs(event, max_depth, cutoff):
                 np.random.shuffle(pairs)
                 break
     return np.array(valid_pairs)
+
+
+def get_dr_valid_pairs(event, max_depth):
+    particles = event.particles
+    pairs = get_all_pairs(particles)
+    valid_pairs = []
+    itr = 0
+    while (pairs.size != 0) and (itr < max_depth):
+        itr += 1
+        for pair in pairs:
+            pathway = dr_validate(pair)
+            if pathway != 0:
+                pair.set_pathway(pathway)
+                valid_pairs.append(pair)
+                for part in valid_pairs[-1].particles:
+                    particles = np.delete(particles, np.where(particles == part))
+                pairs = get_all_pairs(particles)
+                np.random.shuffle(pairs)
+                break
+    return np.array(valid_pairs)
+
+
+def form_dr_deuterons(event, max_depth=50):
+    valid_pairs = get_dr_valid_pairs(event, max_depth)
+    deuterons = []
+    if valid_pairs.size != 0:
+        for pair in valid_pairs:
+            pair.com()
+            X = pair.get_inter_particle()
+            pair.lab()
+            invar_mass = X.p[0]
+            p_mag = ((invar_mass**2)-(deut_mass**2))/(2*invar_mass)
+            p_vect = p_mag * isotropic_sample()
+            E = np.sqrt((invar_mass**2) + (np.sum(p_vect)**2))
+            fv = FourVector([E, *p_vect])
+            d = dp.Deuteron(pair.mat_type, fv, pair.cm_velo, pair.pathway)
+            d.lab()
+            deuterons.append(d)
+        return deuterons
+    return None
 
 
 def isotropic_sample():
