@@ -103,7 +103,7 @@ def hh_dpi_cross(k):
             the cross-section, sigma, of the interaction in barns
     """
     eta = k*2
-    if eta < 0.7:
+    if k < 0.7:
         return 0
     params = [170, 1.34, 1.77, 0.38, 0.096]
     a, b, c, d, e = params
