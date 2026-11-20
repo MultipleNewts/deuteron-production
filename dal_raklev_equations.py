@@ -148,10 +148,12 @@ if __name__ == "__main__":
     plt.plot(X, Y4, label=r"$N_{1}N_{2}\to d\pi$")
     plt.plot(X, Y5, label=r"$pn\to d\pi^{+}\pi^{-}$")
     plt.legend()
-    # plt.yscale("log")
     plt.loglog()
     plt.ylim([0.01, 1e4])
     plt.xlim([0.1, 10])
+    plt.xlabel(r"$k$ $(GeV)$")
+    plt.ylabel(r"Cross-Section, $\sigma$ $(\mu b)$")
+    plt.title("Cross Sections of Various Deuteron Production Pathways")
     plt.show()
 
 # %%
