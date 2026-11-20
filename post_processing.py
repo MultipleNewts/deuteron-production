@@ -22,7 +22,7 @@ def get_cross_section(deuterons, nevents):
     return (count/nevents)*100e-3
 
 
-def get_trnsv_momentum(deuteron):
+def get_trans_momentum(deuteron):
     vect = deuteron.vector.p
     px = vect[1]
     py = vect[2]
