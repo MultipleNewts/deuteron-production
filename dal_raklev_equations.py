@@ -1,6 +1,6 @@
 # %%
 import numpy as np
-from combinations import DR_valid_combs
+import combinations as cmb
 from data_parser import Hadron
 import matplotlib.pyplot as plt
 
@@ -71,13 +71,15 @@ def hh_pi0_cross(k, types):
         ----------
         k : `float`
             the difference in momentum between the two interacting particles
+        types : `array`
+            the `Hadron.[type]` types of the particles in the pair
 
         Returns
         -------
         sigma : `float`
             the cross-section, sigma, of the interaction in barns
     """
-    if (types == DR_valid_combs[2]) or (types == DR_valid_combs[3]):
+    if (types == cmb.DR_valid_combs[2]) or (types == cmb.DR_valid_combs[3]):
         params = [5.099e15, 1.656e1, 2.333e7, 1.133e1, 2.868e16]
     else:
         params = [2.855e6, 1.311e1, 2.961e3, 5.572, 1.461e6]
@@ -107,7 +109,7 @@ def hh_dpi_cross(k):
         return 0
     params = [170, 1.34, 1.77, 0.38, 0.096]
     a, b, c, d, e = params
-    return (a*np.power(eta, b))/(np.power((c - np.exp(d*eta)), 2) + e)
+    return 0.5*((a*np.power(eta, b))/(np.power((c - np.exp(d*eta)), 2) + e))
 
 
 def pn_pipm_cross(k):
@@ -140,7 +142,7 @@ if __name__ == "__main__":
     Y1 = np.array([pn_dg_cross(val) for val in X])
     Y2 = [hh_pi0_cross(val, pp) for val in X]
     Y3 = [hh_pi0_cross(val, pn) for val in X]
-    Y4 = np.array([hh_dpi_cross(val) for val in X])/2
+    Y4 = np.array([hh_dpi_cross(val) for val in X])
     Y5 = [pn_pipm_cross(val) for val in X]
     plt.plot(X, Y1, label=r"$pn\to d\gamma$")
     plt.plot(X, Y2, label=r"$N N\to d\pi^{0}\pi$")
