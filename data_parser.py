@@ -57,6 +57,7 @@ class Pairing:
     mat_type: MatterType
     particles: np.ndarray
     cm_velo: np.ndarray = field(init=False)
+    pathway: int = field(default=0, init=False)
 
     def __post_init__(self):
         self.cm_velo = self.get_pair_v()
@@ -78,10 +79,14 @@ class Pairing:
         X = self.get_inter_particle()
         return X.get_velo()
 
+    def set_pathway(self, pathway):
+        self.pathway = pathway
+
 
 @dataclass
 class Deuteron(Particle):
     cm_velo: np.ndarray
+    pathway: int
     particle: Hadron = field(default=Hadron.DEUTERON, init=False)
     mass: float = field(default=1.875612, init=False)
 
@@ -109,7 +114,7 @@ class EventCatalogue:
         events = content.split("\n\n")
 
         if self.debug is True:
-            top = 10
+            top = 100
         else:
             top = -1
 
