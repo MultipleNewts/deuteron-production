@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 # if __name__ == "__main__":
 # %%
 EC = dp.EventCatalogue("deuteron.dat", debug=False)
-
+print(len(EC.events))
 
 # %%
 nevents = 50
@@ -54,15 +54,15 @@ plt.ylabel(r"# of Occurrences, $n$")
 plt.title("Distribution of Transverse Momenta")
 
 # %%
-nevents = 1000
+nevents = len(EC.events)
 sigmas = []
 all_ds = []
 
 ds = []
 itr = 1
 for event in EC.events[:nevents]:
-    if itr % (nevents//10) == 0:
-        print(f"{itr*100/nevents}% complete...")
+    if itr % (nevents//1000) == 0:
+        print(f"{itr*100/nevents:.4f}% complete...")
     event_ds = cmb.form_dr_deuterons(event)
     if event_ds is not None:
         ds.append(event_ds)
