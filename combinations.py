@@ -18,6 +18,8 @@ DR_valid_combs = [
 ]
 
 deut_mass = 1.8756129
+pi0_mass = 0.1349768
+pi_pm_mass = 0.13957039
 
 
 def get_all_pairs(particles):
@@ -111,6 +113,23 @@ def get_dr_valid_pairs(event, max_depth):
     return np.array(valid_pairs)
 
 
+def get_common_p(invar_mass, path):
+    m1 = deut_mass
+    if path == 2:
+        m2 = (2/3)*pi_pm_mass+(1/3)*pi0_mass + pi0_mass
+    elif path == 3:
+        m2 = (2/3)*pi_pm_mass+(1/3)*pi0_mass
+    elif path == 4:
+        m2 = 2*pi_pm_mass
+    else:
+        m2 = 0
+
+    term1 = (np.power(invar_mass, 2) - np.power((m1+m2), 2))
+    term2 = (np.power(invar_mass, 2) - np.power((m1-m2), 2))
+    scale = 1/(2*invar_mass)
+    return scale*np.sqrt(term1*term2)
+
+
 def form_dr_deuterons(event, max_depth=50):
     valid_pairs = get_dr_valid_pairs(event, max_depth)
     deuterons = []
@@ -120,7 +139,7 @@ def form_dr_deuterons(event, max_depth=50):
             X = pair.get_inter_particle()
             pair.lab()
             invar_mass = X.p[0]
-            p_mag = ((invar_mass**2)-(deut_mass**2))/(2*invar_mass)
+            p_mag = get_common_p(invar_mass, pair.pathway)
             p_vect = p_mag * isotropic_sample()
             E = np.sqrt((invar_mass**2) + (np.sum(p_vect)**2))
             fv = FourVector([E, *p_vect])
@@ -153,8 +172,8 @@ def form_deuterons(event, max_depth=50, cutoff=0.1):
         for pair in valid_pairs:
             pair.com()
             X = pair.get_inter_particle()
-            pair.lab()
             invar_mass = X.p[0]
+            pair.lab()
             p_mag = ((invar_mass**2)-(deut_mass**2))/(2*invar_mass)
             p_vect = p_mag * isotropic_sample()
             E = np.sqrt((invar_mass**2) + (np.sum(p_vect)**2))
